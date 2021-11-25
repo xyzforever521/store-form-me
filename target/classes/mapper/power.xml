@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybaits.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="entity.Power">
+    <insert id="power" parameterType="entity.Power"
+            useGeneratedKeys="true" keyProperty="powerId" keyColumn="power_id">
+    insert into user_power(role_id, user_no) values (#{roleId}, #{userNo})
+    </insert>
+</mapper>

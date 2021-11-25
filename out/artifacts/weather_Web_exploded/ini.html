@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>天气查询系统</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" type="text/css" href="assets/element-plus/index.css">
+    <!-- 引入组件库 -->
+    <script src="/assets/vue/vue.global.js"></script>
+    <script src="/assets/element-plus/index.full.js"></script>
+    <script src="/assets/axios/axios.js"></script>
+    <style>
+        .login-box {
+            border: 1px solid gainsboro;
+            width: 350px;
+            margin: 180px auto;
+            padding: 35px 35px 15px 35px;
+            border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            box-shadow: 0 0 25px #909399;
+            background-color: #bbbbbb;
+        }
+        .login-title{
+            text-align: center;
+            margin: 0 auto 40px auto;
+            color: #303133;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-form ref="loginForm" label-width="80px" :rules="rules" :model="form" class="login-box">
+        <h2 class="login-title">账号初始化</h2>
+        <el-form-item label="账号" prop="userName">
+            <el-input type="text" placeholder="请输入账号" v-model="form.userName"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+            <el-input type="password" placeholder="请输入密码" v-model="form.password"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" v-on:click="onSubmit('loginForm')" style="width:200px">初始化</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+<script>
+    const Main = {
+        data() {
+            return {
+                form: {
+                    userName: ''
+                    ,password: ''
+                }
+                ,rules:{
+                    userName: [
+                        {required: true,message : '账号不能为空' , trigger:'blur'}
+                    ],
+                    password:[
+                        {required: true,message : '密码不能为空' , trigger:'blur'}
+                    ]
+                }
+            }
+        }
+        ,methods : {
+            onSubmit(formName){
+                const form = this.$refs[formName];
+                form.validate((valid) => {
+                    if(valid){
+                        const form = this.form;
+                        const $message = this.$message;
+                        const params = new URLSearchParams();
+                        params.append("userName", form.userName);
+                        params.append("password", form.password);
+                        axios.post("/api/ini", params, {}).then(function (response) {
+                            console.info(response);
+                            const json = response.data;
+                            if(json.code=="0"){
+                                alert("初始化成功,祝您使用愉快");
+                                window.location.href = "login.html";
+                            }else{
+                                $message.error({message:json.message, offset: 100});
+                            }
+                        });
+                    }
+                })
+            }
+            ,onAdd(){
+                window.location.href="add.html";
+            }
+        }
+    };
+    //初始化Vue
+    const app = Vue.createApp(Main);
+    app.use(ElementPlus);
+    app.mount("#app");
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>天气插入系统</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" type="text/css" href="/assets/element-plus/index.css">
+    <!-- 引入组件库 -->
+    <script src="/assets/vue/vue.global.js"></script>
+    <script src="/assets/element-plus/index.full.js"></script>
+    <script src="/assets/element-plus/locale/zh-cn.js"></script>
+    <script src="/assets/axios/axios.js"></script>
+
+    <style>
+        .el-form {
+            border: 1px solid #DCDFE6;
+            width: 600px;
+            margin: 180px auto;
+            padding: 35px 35px 15px 35px;
+            border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            box-shadow: 0 0 25px #909399;
+        }
+    </style>
+
+</head>
+<body>
+<div id="app">
+    <el-form ref="WeatherForm" :model="form" :rules="rules" label-width="80px">
+        <el-descriptions title="天气表单" :column="1" border>
+            <el-descriptions-item label="身份">管理员</el-descriptions-item>
+            <el-descriptions-item label="天气类型">
+                <el-select v-model="form.weatherName" style="width: 100%">
+                    <el-option label="晴天" value="1"></el-option>
+                    <el-option label="雨天" value="2"></el-option>
+                    <el-option label="大风" value="3"></el-option>
+                    <el-option label="雪天" value="4"></el-option>
+                    <el-option label="雷雨" value="5"></el-option>
+                    <el-option label="暴雨" value="6"></el-option>
+                </el-select>
+            </el-descriptions-item>
+            <el-descriptions-item label="插入天气时间">
+                <el-form-item prop="weatherTime" label-width="0px">
+                    <div class="block">
+                        <el-date-picker
+                                v-model="form.weatherTime"
+                                type="date"
+                                placeholder="选取插入天气的时间"
+                                @change="changeTimeRange">
+                        </el-date-picker>
+                    </div>
+                </el-form-item>
+            </el-descriptions-item>//
+            <el-descriptions-item label="最高温度"  prop="weatherHigh">
+                <el-form-item prop="weatherHigh" label-width="0px">
+                    <div style="text-align: left">
+                        <el-input-number v-model="form.weatherHigh" :min="-100" :max="100" @change="handleChange" />
+                    </div>
+                </el-form-item>
+            </el-descriptions-item>
+            <el-descriptions-item label="最低温度"  prop="weatherLow">
+                <el-form-item prop=weatherLow" label-width="0px">
+                    <div style="text-align: left">
+                        <el-input-number v-model="form.weatherLow" :min="-100" :max="100" @change="handleChange" />
+                    </div>
+                </el-form-item>
+            </el-descriptions-item>
+        </el-descriptions>
+        <div style="text-align: center;padding-top: 30px">
+            <el-button type="primary" v-on:click="onSubmit('WeatherForm')">立即上传</el-button>
+        </div>
+    </el-form>
+
+</div>
+
+<script>
+
+    const weathername = ["晴天", "雨天", "大风", "雪天", "雷雨", "暴雨"];
+    var Main = {
+        data() {
+            return {
+
+                form: {
+                    weatherName: "1",
+                    weatherTime: "",
+                    weatherHigh: "",
+                    weatherLow : ""
+                },
+                rules: {
+                    weatherTime: [
+                        {required: true, message: '请选择时间', trigger: 'blur'}
+                    ],
+                    weatherHigh : [
+                        {required: true, message: '请输入最高气温', trigger: 'blur'}
+                    ],
+                    weatherLow : [
+                        {required: true, message: '请输入最低气温', trigger: 'blur'}
+                    ]
+                }
+            }
+        }
+        ,methods:{
+            onSubmit(formName) {
+                const objApp = this;
+                const formData = this.form;
+                const $message = this.$message;
+                this.$refs[formName].validate(function (valid){
+                    if (valid){
+                        const params = new URLSearchParams();
+                        params.append("weather_time", formData.weatherTime.getTime());
+                        params.append("weather_name", weathername[formData.weatherName - 1]);
+                        params.append("weather_low", formData.weatherLow);
+                        params.append("weather_high", formData.weatherHigh);
+                        axios.post("/api/weather", params)
+                        .then(function (response){
+                            const json = response.data;
+                            if (json.code == "0"){
+                                objApp.$alert("天气已上传",{
+                                    callback:function (){
+                                        window.location.href="/today.html";
+                                    }
+                                })
+                            }else{
+                                $message.error({message:json.message, offset:100})
+                            }
+                        })
+                    }
+                })
+            }
+        }
+    };
+    ElementPlus.locale(ElementPlus.lang.zhCn);
+    const app = Vue.createApp(Main);
+    app.use(ElementPlus, ElementPlus.lang.zhCn);
+    app.mount("#app")
+</script>
+</body>
+</html>

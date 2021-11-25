@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybaits.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="entity.User">
+    <select id="selectByUserName" parameterType="String" resultType="entity.User">
+        select * from user where user_name = #{value}
+    </select>
+    <select id="selectByUserNo" parameterType="Integer" resultType="entity.User">
+        select * from user where user_no = #{value}
+    </select>
+    <select id="selectTenUser" parameterType="Integer" resultType="entity.User">
+        select * from user where user_status != 2
+        order by user_no limit #{value}, 10
+    </select>
+
+    <delete id="deleteByUserNo" parameterType="Integer">
+        delete from user where user_no = #{value}
+    </delete>
+
+    <insert id="insertUser" parameterType="entity.User"
+            useGeneratedKeys="true" keyProperty="userNo" keyColumn="user_no">
+        insert into user(user_name, password, user_status) values (#{userName}, #{password}, #{userStatus})
+    </insert>
+
+    <insert id="iniUser" parameterType="entity.User">
+        insert into user(user_no, user_name, password, user_status) values (#{userNo}, #{userName}, #{password}, #{userStatus})
+    </insert>
+</mapper>

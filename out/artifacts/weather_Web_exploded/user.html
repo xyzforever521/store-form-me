@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" type="text/css" href="/assets/element-plus/index.css">
+    <!-- 引入组件库 -->
+    <script src="/assets/vue/vue.global.js"></script>
+    <script src="/assets/element-plus/index.full.js"></script>
+    <script src="/assets/axios/axios.js"></script>
+
+    <style>
+        .button{
+            position: absolute;
+            top: 800px;
+            left: 700px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h2>用户列表</h2>
+    <el-table
+            ref="singleTable"
+            :data="tableData"
+            highlight-current-row
+            style="width: 100%">
+
+        <el-table-column
+                property="userNo"
+                label="用户NO">
+        </el-table-column>
+        <el-table-column
+                property="userName"
+                label="用户名">
+        </el-table-column>
+        <el-table-column
+                property="userStatus"
+                label="身份">
+        </el-table-column>
+    </el-table>
+<div class="button">
+    <el-row>
+        <el-button round v-on:click="prev">上一页</el-button>
+        <el-button round v-on:click="next">下一页</el-button>
+        <el-button round v-on:click="deleteUser(UserNo)">删除用户</el-button>
+    </el-row>
+</div>
+</div>
+
+<script>
+
+    var page = sessionStorage.page;
+    if (page == null) page = 1;
+    var Main = {
+        data() {
+            return {
+                tableData: []
+            }
+        }
+        ,methods:{
+            prev(){
+                sessionStorage.clear();
+                sessionStorage.page = --page == 0 ? 1 : page;
+                window.location.href="user.html"
+            }
+            ,next(){
+                sessionStorage.clear();
+                sessionStorage.page = ++page == 3 ? 2 : page;
+                window.location.href="user.html"
+            }
+            ,deleteUser(){
+                window.location.href="delete.html";
+            }
+        }
+        ,mounted() {
+            const objApp = this;
+            var page = sessionStorage.page;
+            sessionStorage.clear();
+            if (page == null) page = 1;
+            axios.get("/api/userList?page=" + page)
+                .then(function (response) {
+                    objApp.tableData.splice(0, objApp.tableData.length);
+                    response.data.data.list.forEach(function (item,index) {
+                        item.userStatus = "普通用户";
+                        objApp.tableData.push(item);
+                        console.log(item.userNo);
+
+                    });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    };
+    const app = Vue.createApp(Main);
+    app.use(ElementPlus);
+    app.mount("#app")
+</script>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>天气查询系统</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" type="text/css" href="assets/element-plus/index.css">
+    <!-- 引入组件库 -->
+    <script src="/assets/vue/vue.global.js"></script>
+    <script src="/assets/element-plus/index.full.js"></script>
+    <script src="/assets/axios/axios.js"></script>
+    <style>
+        .login-box {
+            border: 1px solid #DCDFE6;
+            width: 350px;
+            margin: 180px auto;
+            padding: 35px 35px 15px 35px;
+            border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            box-shadow: 0 0 25px #909399;
+        }
+        .login-title{
+            text-align: center;
+            margin: 0 auto 40px auto;
+            color: #303133;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-form ref="DeleteForm" label-width="80px" :rules="rules" :model="form" class="login-box">
+        <h2 class="login-title">用户删除</h2>
+        <el-form-item label="用户NO" prop="userNo">
+            <el-input type="text" placeholder="请输入删除用户的NO" v-model="form.userNo"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" v-on:click="onDelete('DeleteForm')" style="width:200px">提交</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+<script>
+    const Main = {
+        data() {
+            return {
+                form: {
+                    userNo:""
+                }
+                ,rules:{
+                    userNo: [
+                        {required: true,message : 'No' , trigger:'blur'}
+                    ]
+                }
+            }
+        }
+        ,methods : {
+            onDelete(formName){
+                const form = this.$refs[formName];
+                form.validate((valid) => {
+                    if(valid){
+                        const form = this.form;
+                        const $message = this.$message;
+                        const params = new URLSearchParams();
+                        params.append("userNo", form.userNo);
+                        axios.post("/api/delete", params, {});
+                        alert("该用户已经删除!");
+                        window.location.href="user.html";
+                    }
+                })
+            }
+        }
+    };
+    //初始化Vue
+    const app = Vue.createApp(Main);
+    app.use(ElementPlus);
+    app.mount("#app");
+</script>
+</body>
+</html>
